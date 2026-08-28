@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from backend.app.db.database import engine
-import backend.app.db.models as models
+from app.db.database import engine
+import app.db.models as models
 
 # pour dire à pg de créer la table si elle n'existe pas encore
 models.Base.metadata.create_all(bind=engine)
