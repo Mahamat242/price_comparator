@@ -2,13 +2,13 @@
 
 # 🛒 Price Comparator (Jumia vs Expat Dakar)
 
-**Plateforme web d'extraction, d'agrégation et de comparaison de prix e-commerce au Sénégal.**
+**Plateforme web full-stack d'extraction, d'agrégation et de comparaison de prix e-commerce au Sénégal.**
 
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-5.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
 </div>
 
@@ -25,8 +25,8 @@
 - 🔍 **Scraping Multi-Sources :** Extraction automatique des titres, prix, images et URLs directes depuis Jumia et Expat Dakar.
 - ⚡ **API REST Performante :** Backend sous FastAPI avec typage strict (Pydantic) et validation des données.
 - ⚛️ **Interface React Dynamique :** Comparaison instantanée, tri par prix et filtrage par plateforme.
-- 💾 **Stockage & Cache :** Sauvegarde des recherches dans une base de données pour optimiser les performances des requêtes fréquentes.
-- 🏗️ **Architecture Modulaire :** Structuration propre séparant l'extraction (scrapers), le service web (API) et la vue (frontend).
+- 🐘 **Stockage Robuste (PostgreSQL) :** Gestion persistance des données et exploitation des capacités `JSONB` et de la recherche textuelle avancée.
+- 🐳 **Conteneurisation (Docker Compose) :** Orchestration clé en main de la base de données PostgreSQL et du serveur de cache Redis.
 
 ---
 
@@ -38,18 +38,16 @@ price_comparator/
 │   ├── app/
 │   │   ├── api/              # Endpoints & Routes FastAPI
 │   │   ├── scrapers/         # Scripts de scraping (Jumia, ExpatDakar)
-│   │   ├── models/           # Modèles de base de données (SQLAlchemy)
+│   │   ├── db/               # Configuration SQLAlchemy & Modèles PostgreSQL
 │   │   └── main.py           # Point d'entrée de l'application FastAPI
-│   ├── requirements.txt      # Dépendances Python
-│   └── .env.example          # Variables d'environnement
+│   └── requirements.txt      # Dépendances Python
 │
-├── frontend/                 # ⚛️ Application Frontend React
+├── frontend/                 # ⚛️ Application Frontend React (Vite)
 │   ├── src/
 │   │   ├── components/       # Composants réutilisables (SearchBar, ProductCard, etc.)
-│   │   ├── services/         # Appels API (Axios / Fetch)
-│   │   ├── App.jsx           # Composant racine
-│   │   └── main.jsx          # Point d'entrée React
-│   ├── package.json          # Dépendances JavaScript
-│   └── vite.config.js        # Configuration Vite
+│   │   ├── services/         # Client API HTTP
+│   │   └── App.jsx           # Composant principal
+│   └── package.json          # Dépendances JavaScript
 │
+├── docker-compose.yml        # Orchestration PostgreSQL & Redis
 └── README.md
