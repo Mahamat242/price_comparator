@@ -17,7 +17,6 @@ class Jumia(Base):
         for i in articles:
             title_tag = i.find('h3', class_='name')
             price_tag = i.find('div', class_='prc')
-            category = categorie
             productUrl_tag = i.find('a', class_='core')
             imgTag = i.find('img', class_='img')
 

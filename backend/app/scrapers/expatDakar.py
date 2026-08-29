@@ -12,22 +12,20 @@ class ExpatDakar(Base):
         if not divArticles:
             print(f"expat dakar : pas de div d'articles pour la catégorie : {categorie}")
             return []
-        articles = divArticles.find_all('div', class_='listings-cards__list-item ')
+        articles = divArticles.find_all('a', class_='cars-listing-card__inner listing-card__inner')
         data = []
         for i in articles:
             title_tag = i.find('div', class_='listing-card__header__title')
             price_tag = i.find('div', class_='listing-card__info-bar__price')
-            category = categorie
-            productUrl_tag = i.find('a', class_='listing-card__inner')
-            imgTag = i.find('img', class_='listing-card__image__resource vh-img')
+            imgTag = i.find('img')
 
             # protection contre les balises manquantes
-            if not title_tag or not price_tag or not productUrl_tag:
+            if not title_tag or not price_tag:
                 continue
 
             title = title_tag.get_text(strip=True)
             price = self.clean_price(price_tag.get_text(strip=True))
-            productUrl = self.url_construct(productUrl_tag.get('href'))
+            productUrl = self.url_construct(i.get('href'))
             imageUrl = (imgTag.get('data-src') or imgTag.get('src')) if imgTag else None
 
             data.append(
@@ -35,7 +33,7 @@ class ExpatDakar(Base):
                     'title': title,
                     'price': price,
                     'category': categorie,
-                    'source': 'Jumia',
+                    'source': 'Expat Dakar',
                     'product_url': productUrl,
                     'image_url': imageUrl,
                 }
@@ -49,7 +47,7 @@ class ExpatDakar(Base):
         soup = BeautifulSoup(htmlContent, "html.parser")
         data = []
 
-          # recherche des catégories
+        # recherche des catégories
         divCat = soup.find('div', class_='tw-hero-categories-track')
         if divCat :
             cat = divCat.find_all('a', class_='tw-hero-icon')
@@ -60,7 +58,7 @@ class ExpatDakar(Base):
                 if not htmlContentCategorie: continue
                 soupCategoriePage = BeautifulSoup(htmlContentCategorie, 'html.parser')
 
-                # extraction des articles
+                # extraction des articles de la première page
                 data.extend(self.data_extraction(item['categorie'], soupCategoriePage))
 
                 # parcourir la pagination
@@ -71,7 +69,7 @@ class ExpatDakar(Base):
                     divPage = currentSoup.find('ul', class_='pagination')
                     if not divPage: break
 
-                    nextPage = divPage.find('a', class_='page-link', attrs={'aria-label' : 'Suivant »'})
+                    nextPage = divPage.find('a', class_='page-link', attrs={'rel' : 'next'}) or divPage.find('a', class_='page-link', attrs={'aria-label': 'Suivant »'})
                     if not nextPage or not nextPage.get('href'): break
 
                     # chargement de la page suivante
