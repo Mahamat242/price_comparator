@@ -61,7 +61,7 @@ class Jumia(Base):
                 soupCategoriePage = BeautifulSoup(htmlContentCategorie, 'html.parser')
 
                 # extraction des articles de la première page
-                data.extend(self.data_extraction(item['categorie'], soupCategoriePage))                
+                data.extend(self.data_extraction(item['categorie'], soupCategoriePage))
 
                 # parcourir la paignation
                 page = 0 # pour limiter l'itération à 3 pages
@@ -84,3 +84,4 @@ class Jumia(Base):
                     page += 1
 
         return data
+    
