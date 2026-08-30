@@ -8,20 +8,27 @@ from app.services.scraperServices import ScraperService
 router = APIRouter()
 
 
-async def _run_scraper(scraper_name: str):
-    """ ouvre une nouvelle session DB indépendante du cycle de vie de la requête """
+async def _run_single_scraper(scraper_name: str):
+    """ ouvre une session DB dédiée pour un seul scraper """
     async with AsyncSessionLocal() as db:
         service = ScraperService(db)
         if scraper_name == "jumia":
             await service.run_jumia()
         elif scraper_name == "expat_dakar":
             await service.run_expat_dakar()
-        elif scraper_name == "all":
-            await asyncio.gather(
-                service.run_jumia(),
-                service.run_expat_dakar(),
-                return_exceptions=True
-            )
+
+
+async def _run_scraper(scraper_name: str):
+    """ ouvre une nouvelle session DB indépendante du cycle de vie de la requête """
+    if scraper_name == "all":
+        # chaque scraper a sa propre session pour éviter les conflits de concurrence
+        await asyncio.gather(
+            _run_single_scraper("jumia"),
+            _run_single_scraper("expat_dakar"),
+            return_exceptions=True
+        )
+    else:
+        await _run_single_scraper(scraper_name)
 
 
 @router.post("/jumia", status_code=status.HTTP_202_ACCEPTED)

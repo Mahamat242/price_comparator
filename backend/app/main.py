@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,6 +7,13 @@ from app.db.database import engine
 import app.db.models as models
 from app.api.products import router as productsRouter
 from app.api.scrapers import router as scrapersRouter
+
+# configuration du logging — affiche tous les messages INFO+ dans le terminal
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+    datefmt="%H:%M:%S"
+)
 
 # création automatique des tables de façon asynchrone au démarrage de l'application
 @asynccontextmanager

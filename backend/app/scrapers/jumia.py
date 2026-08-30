@@ -12,8 +12,8 @@ class Jumia(Base):
 
     def data_extraction(self, categorie: str, soupCategoriePage: BeautifulSoup) -> List[Dict[str, Any]]:
         divArticles = soupCategoriePage.find('div', class_='-phm -pvxs row _no-g _4cl-3cm-shs')
-        if not divArticles: 
-            print(f"jumia : pas de div d'articles pour la catégorie : {categorie}")
+        if not divArticles:
+            logger.warning(f"[Jumia] div articles introuvable pour la catégorie : '{categorie}' — la structure HTML a peut-être changé")
             return []
 
         articles = divArticles.find_all('article', class_='prd _fb col c-prd')
@@ -51,10 +51,13 @@ class Jumia(Base):
         return data
 
     async def main(self) -> List[Dict[str, Any]]:
+        logger.info("[Jumia] début du scraping...")
         # utilisation d'un client unique pour l'ensemble des requêtes du scraper
         async with httpx.AsyncClient(headers=self.headers, follow_redirects=True, timeout=15.0) as client:
             htmlContent = await self.fetch_page(self.baseUrl, client=client)
-            if not htmlContent: return []
+            if not htmlContent:
+                logger.error("[Jumia] impossible de charger la page d'accueil")
+                return []
 
             soup = BeautifulSoup(htmlContent, "html.parser")
             data = []
@@ -64,6 +67,7 @@ class Jumia(Base):
             if divCat:
                 cat = divCat.find_all('a', class_="cat-bar-itm")
                 catLinks = self.categorie_links(cat)
+                logger.info(f"[Jumia] {len(catLinks)} catégories trouvées")
 
                 for item in catLinks:
                     htmlContentCategorie = await self.fetch_page(item['url'], client=client)
@@ -93,4 +97,5 @@ class Jumia(Base):
                         
                         page += 1
 
+            logger.info(f"[Jumia] scraping terminé — {len(data)} produits extraits au total")
             return data
