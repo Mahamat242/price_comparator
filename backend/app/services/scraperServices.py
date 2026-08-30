@@ -49,6 +49,7 @@ class ScraperService:
 
         try:
             await self.db.commit()
+            logger.info(f"succès bd : {new_count} nouveaux produits ajoutés, {updated_count} prix mis à jour")
         except Exception as e:
             await self.db.rollback()
             logger.error(f"Erreur d'enregistrement BDD : {e}")
@@ -60,10 +61,12 @@ class ScraperService:
         scraper = Jumia()
         extracted_data = await scraper.main()
         saved_count = await self.save_products(extracted_data)
+        logger.info(f"[jumia] terminé : {len(extracted_data)} extraits, {saved_count} enregistrés")
         return {"total_extracted": len(extracted_data), "total_saved": saved_count}
 
     async def run_expat_dakar(self) -> Dict[str, Any]:
         scraper = ExpatDakar()
         extracted_data = await scraper.main()
         saved_count = await self.save_products(extracted_data)
+        logger.info(f"[expat dakar] terminé : {len(extracted_data)} extraits, {saved_count} enregistrés")
         return {"total_extracted": len(extracted_data), "total_saved": saved_count}
