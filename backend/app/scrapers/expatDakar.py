@@ -18,7 +18,7 @@ class ExpatDakar(Base):
         
         articles = divArticles.find_all('a', class_='cars-listing-card__inner listing-card__inner')
         data = []
-        
+
         for i in articles:
             title_tag = i.find('div', class_='listing-card__header__title')
             price_tag = i.find('div', class_='listing-card__info-bar__price')
