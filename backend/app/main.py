@@ -8,7 +8,7 @@ import app.db.models as models
 from app.api.products import router as productsRouter
 from app.api.scrapers import router as scrapersRouter
 
-# configuration du logging — affiche tous les messages INFO+ dans le terminal
+# configuration du logging — affiche tous les messages info dans le terminal pour le debug et le suivi
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
