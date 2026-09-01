@@ -1,7 +1,7 @@
 import logging
-import httpx
 from bs4 import BeautifulSoup
 from typing import List, Any, Dict
+from curl_cffi.requests import AsyncSession
 from app.scrapers.base import Base
 
 logger = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ class ExpatDakar(Base):
         super().__init__(baseUrl="https://www.expat-dakar.com/")
 
     def data_extraction(self, categorie: str, soupCategoriePage: BeautifulSoup) -> List[Dict[str, Any]]:
-        """Extrait les informations des annonces d'une page de catégorie."""
+        """Extrait les informations des annonces d'une page de catégorie """
         articles = soupCategoriePage.find_all('div', class_='listing-card')
         if not articles:
             logger.warning(f"[ExpatDakar] Aucun article trouvé pour la catégorie : '{categorie}'")
@@ -30,7 +30,7 @@ class ExpatDakar(Base):
             url_tag = item.find('a', class_='listing-card__inner') or item.find('a', href=True)
             img_tag = item.find('img')
 
-            # Protection contre les balises obligatoires manquantes
+            # protection contre les balises obligatoires manquantes
             if not title_tag or not url_tag:
                 continue
 
@@ -42,7 +42,7 @@ class ExpatDakar(Base):
             price = self.clean_price(price_tag.get_text(strip=True)) if price_tag else 0.0
             product_url = self.url_construct(raw_href)
 
-            # Gestion des images lazy-loading
+            # gestion des images lazy-loading
             image_url = None
             if img_tag:
                 image_url = (
@@ -66,7 +66,8 @@ class ExpatDakar(Base):
     async def main(self) -> List[Dict[str, Any]]:
         """Point d'entrée principal pour lancer le scraping d'Expat Dakar."""
         logger.info("[ExpatDakar] Début du scraping...")
-        async with httpx.AsyncClient(headers=self.headers, follow_redirects=True, timeout=15.0) as client:
+        # utilisation d'un client unique pour l'ensemble des requêtes du scraper
+        async with AsyncSession(impersonate="chrome124", headers=self.headers) as client:
             html_content = await self.fetch_page(self.baseUrl, client=client)
             if not html_content:
                 logger.error("[ExpatDakar] Impossible de charger la page d'accueil")
@@ -75,7 +76,7 @@ class ExpatDakar(Base):
             soup = BeautifulSoup(html_content, "html.parser")
             data = []
 
-            # Recherche des catégories
+            # recherche des catégories
             div_cat = soup.find('div', class_='tw-hero-categories-track')
             if div_cat:
                 cat = div_cat.find_all('a', class_='tw-hero-icon')
@@ -85,13 +86,14 @@ class ExpatDakar(Base):
                 for item in cat_links:
                     html_content_categorie = await self.fetch_page(item['url'], client=client)
                     if not html_content_categorie:
+                        logger.debug(f"[ExpatDakar] l'url suivant n'a pas abouti : {item['url']}")
                         continue
                     soup_categorie_page = BeautifulSoup(html_content_categorie, 'html.parser')
 
-                    # Extraction des articles de la première page
+                    # extraction des articles de la première page
                     data.extend(self.data_extraction(item['categorie'], soup_categorie_page))
 
-                    # Parcourir la pagination
+                    # parcourir la pagination
                     page = 0
                     current_soup = soup_categorie_page
 
@@ -110,7 +112,7 @@ class ExpatDakar(Base):
                         if not next_href:
                             break
 
-                        # Chargement de la page suivante
+                        # chargement de la page suivante
                         html_content_pagination = await self.fetch_page(self.url_construct(next_href), client=client)
                         if not html_content_pagination:
                             break
