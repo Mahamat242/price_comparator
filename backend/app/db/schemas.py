@@ -5,6 +5,8 @@ from datetime import datetime
 class ProductBase(BaseModel):
     title: str
     price: float
+    description: Optional[str] = None
+    category: Optional[str] = None
     currency: str = "FCFA"
     source: str
     product_url: str
