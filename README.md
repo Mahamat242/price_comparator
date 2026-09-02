@@ -13,6 +13,12 @@
 </div>
 
 ---
+## 📸 Screenshot
+<p align="center">
+  <img src="frontend/public/screenshot.png" alt="Accueil" width="500">
+</p>
+
+---
 
 ## 📌 À propos du projet
 
