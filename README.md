@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![Tailwind CSS](https://shields.io)](https://tailwindcss.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.0+-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
@@ -23,7 +23,7 @@
 
 ## 📌 À propos du projet
 
-**Price Comparator** est un outil conçu pour automatiser la recherche et la veille tarifaire en ligne. L'application extrait dynamiquement les offres de produits depuis **Jumia Sénégal** et **Expat Dakar**, agrège les données via une API REST sous **FastAPI**, et présente les résultats comparatifs côte à côte sur une interface réactive développée en **React**.
+**Price Comparator** est un outil conçu pour automatiser la recherche et la veille tarifaire en ligne. L'application extrait dynamiquement les offres de produits depuis **Jumia Sénégal** et **Expat Dakar**, agrège les données via une API REST sous **FastAPI**, et présente les résultats comparatifs côte à côte sur une interface réactive développée en **React** et stylisée avec **Tailwind CSS**.
 
 ---
 
@@ -31,7 +31,7 @@
 
 - 🔍 **Scraping Multi-Sources :** Extraction automatique des titres, prix, images et URLs directes depuis Jumia et Expat Dakar.
 - ⚡ **API REST Performante :** Backend sous FastAPI avec typage strict (Pydantic) et validation des données.
-- ⚛️ **Interface React Dynamique :** Comparaison instantanée, tri par prix et filtrage par plateforme.
+- ⚛️ **Interface React & Tailwind CSS :** Comparaison instantanée, design moderne responsive, tri par prix et filtrage par plateforme.
 - 🐘 **Stockage Robuste (PostgreSQL) :** Gestion persistance des données et exploitation des capacités `JSONB` et de la recherche textuelle avancée.
 - 🐳 **Conteneurisation (Docker Compose) :** Orchestration clé en main de la base de données PostgreSQL et du serveur de cache Redis.
 
@@ -49,11 +49,12 @@ price_comparator/
 │   │   └── main.py           # Point d'entrée de l'application FastAPI
 │   └── requirements.txt      # Dépendances Python
 │
-├── frontend/                 # ⚛️ Application Frontend React (Vite)
+├── frontend/                 # ⚛️ Application Frontend React (Vite & Tailwind CSS)
 │   ├── src/
 │   │   ├── components/       # Composants réutilisables (SearchBar, ProductCard, etc.)
 │   │   ├── services/         # Client API HTTP
 │   │   └── App.jsx           # Composant principal
+│   ├── tailwind.config.js    # Configuration Tailwind CSS
 │   └── package.json          # Dépendances JavaScript
 │
 ├── docker-compose.yml        # Orchestration PostgreSQL & Redis
