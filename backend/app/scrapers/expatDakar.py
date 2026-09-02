@@ -30,7 +30,7 @@ class ExpatDakar(Base):
             url_tag = item.find('a', class_='listing-card__inner') or item.find('a', href=True)
             img_tag = item.find('img')
 
-            # protection contre les balises obligatoires manquantes
+            # verifie les champs obligatoires
             if not title_tag or not url_tag:
                 continue
 
@@ -42,7 +42,7 @@ class ExpatDakar(Base):
             price = self.clean_price(price_tag.get_text(strip=True)) if price_tag else 0.0
             product_url = self.url_construct(raw_href)
 
-            # gestion des images lazy-loading
+            # image avec lazy loading
             image_url = None
             if img_tag:
                 image_url = (
@@ -64,9 +64,8 @@ class ExpatDakar(Base):
         return data
 
     async def main(self) -> List[Dict[str, Any]]:
-        """Point d'entrée principal pour lancer le scraping d'Expat Dakar."""
         logger.info("[ExpatDakar] Début du scraping...")
-        # utilisation d'un client unique pour l'ensemble des requêtes du scraper
+        # session client partagee
         async with AsyncSession(impersonate="chrome124", headers=self.headers) as client:
             html_content = await self.fetch_page(self.baseUrl, client=client)
             if not html_content:
@@ -76,7 +75,7 @@ class ExpatDakar(Base):
             soup = BeautifulSoup(html_content, "html.parser")
             data = []
 
-            # recherche des catégories
+            # recupere les categories
             div_cat = soup.find('div', class_='tw-hero-categories-track')
             if div_cat:
                 cat = div_cat.find_all('a', class_='tw-hero-icon')
@@ -90,10 +89,10 @@ class ExpatDakar(Base):
                         continue
                     soup_categorie_page = BeautifulSoup(html_content_categorie, 'html.parser')
 
-                    # extraction des articles de la première page
+                    # premiere page
                     data.extend(self.data_extraction(item['categorie'], soup_categorie_page))
 
-                    # parcourir la pagination
+                    # pagination
                     page = 0
                     current_soup = soup_categorie_page
 
@@ -112,7 +111,7 @@ class ExpatDakar(Base):
                         if not next_href:
                             break
 
-                        # chargement de la page suivante
+                        # page suivante
                         html_content_pagination = await self.fetch_page(self.url_construct(next_href), client=client)
                         if not html_content_pagination:
                             break

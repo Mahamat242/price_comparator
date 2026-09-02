@@ -11,7 +11,7 @@ class Jumia(Base):
         super().__init__(baseUrl="https://www.jumia.sn/")
 
     def data_extraction(self, categorie: str, soupCategoriePage: BeautifulSoup) -> List[Dict[str, Any]]:
-        # extraction des articles avec selecteur flexible
+        # extraction des articles
         articles = soupCategoriePage.find_all('article', class_=lambda c: c and 'prd' in c)
         if not articles:
             logger.warning(f"[Jumia] div articles introuvable pour la catégorie : '{categorie}' — la structure HTML a peut-être changé")
@@ -25,7 +25,7 @@ class Jumia(Base):
             productUrl_tag = i.find('a', class_='core') or i.find('a', href=True)
             imgTag = i.find('img', class_='img') or i.find('img')
 
-            # protection contre les balises manquantes
+            # verifie les champs obligatoires
             if not title_tag or not price_tag or not productUrl_tag:
                 continue
 
@@ -33,7 +33,7 @@ class Jumia(Base):
             price = self.clean_price(price_tag.get_text(strip=True))
             productUrl = self.url_construct(productUrl_tag.get('href'))
             
-            # gestion des images lazy-loading de jumia
+            # image avec lazy loading
             imageUrl = None
             if imgTag:
                 imageUrl = imgTag.get('data-src') or imgTag.get('src') or imgTag.get('data-lazy-src')
@@ -51,7 +51,7 @@ class Jumia(Base):
         return data
 
     def extract_categories_from_home(self, soup: BeautifulSoup) -> List[Dict[str, str]]:
-        # extraction dynamique des categories de la page d'accueil
+        # categories accueil
         categories = []
         for a in soup.find_all('a', class_='col'):
             href = a.get('href')
@@ -78,7 +78,7 @@ class Jumia(Base):
 
     async def main(self) -> List[Dict[str, Any]]:
         logger.info("[Jumia] début du scraping...")
-        # utilisation d'un client unique pour l'ensemble des requêtes du scraper
+        # session client partagee
         async with AsyncSession(impersonate="chrome124", headers=self.headers) as client:
             htmlContent = await self.fetch_page(self.baseUrl, client=client)
             if not htmlContent:
@@ -88,7 +88,7 @@ class Jumia(Base):
             soup = BeautifulSoup(htmlContent, "html.parser")
             data = []
 
-            # recheche des catégories
+            # recupere les categories
             catLinks = self.extract_categories_from_home(soup)
             if not catLinks:
                 divCat = soup.find('div', class_="crs")
@@ -104,11 +104,11 @@ class Jumia(Base):
                 if not htmlContentCategorie: continue
                 soupCategoriePage = BeautifulSoup(htmlContentCategorie, 'html.parser')
 
-                # extraction des articles de la première page
+                # premiere page
                 data.extend(self.data_extraction(item['categorie'], soupCategoriePage))
 
-                # parcourir la paignation
-                page = 0 # pour limiter l'itération à 3 pages
+                # pagination
+                page = 0 # limite a 2 pages
                 currentSoup = soupCategoriePage
                 
                 while page < 2:
@@ -118,7 +118,7 @@ class Jumia(Base):
                     nextPage = divPage.find('a', class_='pg', attrs={'aria-label': 'Page suivante'})
                     if not nextPage or not nextPage.get('href'): break
 
-                    # chargement de la page suivante
+                    # page suivante
                     htmlContentPagination = await self.fetch_page(self.url_construct(nextPage.get('href')), client=client)
                     if not htmlContentPagination: break
 

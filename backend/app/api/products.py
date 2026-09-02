@@ -25,7 +25,7 @@ async def search_products(
     """
     stmt = select(Product)
 
-    # filtre par mot-clé (dans le titre ou la description)
+    # filtre par mot-cle
     if q:
         search_pattern = f"%{q}%"
         stmt = stmt.where(
@@ -35,25 +35,25 @@ async def search_products(
             )
         )
 
-    # filtre par catégorie
+    # filtre categorie
     if category:
         stmt = stmt.where(Product.category.ilike(f"%{category}%"))
 
-    # filtre par source
+    # filtre source
     if source:
         stmt = stmt.where(Product.source.ilike(f"%{source}%"))
 
-    # filtres par fourchette de prix
+    # filtre prix
     if min_price is not None:
         stmt = stmt.where(Product.price >= min_price)
     if max_price is not None:
         stmt = stmt.where(Product.price <= max_price)
 
-    # comptage total avant pagination
+    # total avant pagination
     count_stmt = select(func.count()).select_from(stmt.subquery())
     total_count = (await db.execute(count_stmt)).scalar_one()
 
-    # application de la pagination et du tri par défaut
+    # pagination et tri
     stmt = stmt.order_by(Product.id.desc()).offset(skip).limit(limit)
     products = (await db.execute(stmt)).scalars().all()
 
@@ -92,7 +92,7 @@ async def compare_products(
             detail="veuillez fournir au moins un identifiant de produit à comparer"
         )
 
-    # récupération des produits correspondant aux identifiants transmis
+    # recuperation des produits
     stmt = select(Product).where(Product.id.in_(ids))
     products = (await db.execute(stmt)).scalars().all()
 
@@ -102,7 +102,7 @@ async def compare_products(
             detail="aucun produit trouvé pour les identifiants fournis"
         )
 
-    # tri des produits par prix croissant
+    # tri par prix croissant
     sorted_products = sorted(products, key=lambda p: p.price)
 
     prices = [p.price for p in sorted_products if p.price is not None]

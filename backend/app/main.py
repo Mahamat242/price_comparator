@@ -8,14 +8,14 @@ import app.db.models as models
 from app.api.products import router as productsRouter
 from app.api.scrapers import router as scrapersRouter
 
-# configuration du logging — affiche tous les messages info dans le terminal pour le debug et le suivi
+# config logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
     datefmt="%H:%M:%S"
 )
 
-# création automatique des tables de façon asynchrone au démarrage de l'application
+# creation des tables au demarrage
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
@@ -29,7 +29,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# configuration du CORS
+# cors
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
@@ -38,7 +38,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# inclusion des routeurs API
+# routes
 app.include_router(productsRouter, prefix="/api/products", tags=["Products"])
 app.include_router(scrapersRouter, prefix="/api/scrapers", tags=["Scrapers"])
 

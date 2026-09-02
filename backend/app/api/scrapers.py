@@ -21,7 +21,7 @@ async def _run_single_scraper(scraper_name: str):
 async def _run_scraper(scraper_name: str):
     """ ouvre une nouvelle session DB indépendante du cycle de vie de la requête """
     if scraper_name == "all":
-        # chaque scraper a sa propre session pour éviter les conflits de concurrence
+        # session independante par scraper
         await asyncio.gather(
             _run_single_scraper("jumia"),
             _run_single_scraper("expat_dakar"),

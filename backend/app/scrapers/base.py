@@ -29,7 +29,7 @@ class Base:
     async def fetch_page(self, url: str, client: Optional[AsyncSession] = None) -> Optional[str]:
         """ effectue un requet http  vers le site de façons asynchrone """
         try:
-            # réutilisation du client s'il est fourni, sinon création d'une session temporaire
+            # reutilisation de session ou creation temporaire
             if client:
                 response = await client.get(url, timeout=15.0)
                 if response.status_code == 200:
@@ -44,7 +44,7 @@ class Base:
                     logger.warning(f"Statut HTTP {response.status_code} pour l'accès à {url}")
                     return None
         except Exception as e:
-            # enregistrement des erreurs d'accès réseau
+            # logs d'erreur
             logger.error(f"Erreur http lors de l'accès à {url} : {e}")
             print(f"Erreur http lors de l'accès à {url} : {e}")
             return None
